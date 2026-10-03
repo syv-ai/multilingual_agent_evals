@@ -4,10 +4,10 @@ version = "0.0.0"
 description = "An automatically generated multilingual version of IFEval, for 300+ languages."
 readme = "README.md"
 authors = [
-    {name = "Dan Saattrup Smart", email = "dan.smart@alexandra.dk"},
+    {name = "Dan Saattrup Smart"},
 ]
 maintainers = [
-    {name = "Dan Saattrup Smart", email = "dan.smart@alexandra.dk"},
+    {name = "Dan Saattrup Smart"},
 ]
 requires-python = ">=3.12,<4.0"
 dependencies = [
@@ -21,8 +21,8 @@ dependencies = [
 ]
 
 [project.urls]
-Repository = "https://github.com/alexandrainst/multi_ifeval"
-Issues = "https://github.com/alexandrainst/multi_ifeval/issues"
+Repository = "https://github.com/syv-ai/multi_ifeval"
+Issues = "https://github.com/syv-ai/multi_ifeval/issues"
 
 [project.license]
 file = "LICENSE"
