@@ -5,6 +5,7 @@ this script modifies EuroEval or starts an evaluation until invoked explicitly.
 """
 
 import argparse
+from functools import partial
 
 from datasets import DatasetDict
 from euroeval import Benchmarker, DatasetConfig
@@ -15,7 +16,7 @@ LANGUAGES = {"da": DANISH, "en": ENGLISH, "de": GERMAN, "fr": FRENCH}
 DATASET = "danish-foundation-models/multi-ifeval"
 
 
-def _preprocess(dataset: DatasetDict) -> DatasetDict:
+def _preprocess(dataset: DatasetDict, max_examples: int | None = None) -> DatasetDict:
     """Expose prompt as text and remove Arrow-padded null constraint arguments.
 
     A normal ``map`` cannot make the nested dictionaries sparse: Arrow reconstructs
@@ -25,10 +26,16 @@ def _preprocess(dataset: DatasetDict) -> DatasetDict:
     Args:
         dataset:
             Released, test-only language dataset.
+        max_examples (optional):
+            Limit the test split for a smoke run. Defaults to None.
 
     Returns:
         Dataset with a text input column and sparse constraint arguments.
     """
+    if max_examples is not None:
+        dataset["test"] = dataset["test"].select(
+            range(min(max_examples, len(dataset["test"])))
+        )
     dataset = dataset.map(
         lambda row: {"text": row["prompt"]}, remove_columns=["prompt"]
     )
@@ -57,19 +64,28 @@ def main() -> None:
         default=None,
         help="Language subset; defaults to da and en (repeat to add languages)",
     )
+    parser.add_argument(
+        "--max-examples",
+        type=int,
+        default=None,
+        help="Smoke test only: use the first N examples (not a publishable score)",
+    )
     args = parser.parse_args()
+    if args.max_examples is not None and args.max_examples < 1:
+        parser.error("--max-examples must be positive")
     languages = list(dict.fromkeys(args.language or ["da", "en"]))
     configs = [
         DatasetConfig(
-            name=f"multi-ifeval-{code}",
-            pretty_name=f"MultiIFEval-{code}",
+            name=f"multi-ifeval-{code}{'-smoke' if args.max_examples else ''}",
+            pretty_name=f"MultiIFEval-{code}{'-smoke' if args.max_examples else ''}",
             source=f"{DATASET}::{code}",
             task=INSTRUCTION_FOLLOWING,
             languages=[LANGUAGES[code]],
+            preprocessing_func=partial(_preprocess, max_examples=args.max_examples),
+            max_generated_tokens=64 if args.max_examples else None,
             train_split=None,
             val_split=None,
             test_split="test",
-            preprocessing_func=_preprocess,
             bootstrap_samples=False,
             unofficial=True,
         )

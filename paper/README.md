@@ -1,10 +1,11 @@
 # NoDaLiDa 2027 submission
 
 The [official call](https://eventsignup.ku.dk/nodalida-27/call-for-papers)
-requires ACL style files; `acl_latex.tex` already uses `acl.sty` in `review` mode.
-The companion `acl_natbib.bst` is bundled from the official ACL style-files repo
-(revision `d5adc823ff0f80f98c80405ca0ab66c68e684409`). There is no separate
-NoDaLiDa LaTeX template. The current draft is aimed at a
+requires ACL style files; `acl_latex.tex` uses `acl.sty` in `review` mode.
+The bundled `acl.sty` matches the latest official ACL style-files repo revision
+checked on 3 October 2026 (`d5adc823ff0f80f98c80405ca0ab66c68e684409`).
+The companion `acl_natbib.bst` is from that revision (with whitespace trimmed).
+There is no separate NoDaLiDa LaTeX template. The current draft is aimed at a
 **regular paper** (up to eight content pages; references, optional limitations and
 ethical considerations sections excluded). A four-page short or demonstration paper
 would require further cuts. Appendices are optional and reviewers need not read them.
@@ -24,33 +25,62 @@ configurations; pin a Hub commit and check counts before making precise claims.
 
 ## Small evaluation (not yet run)
 
-The companion `evaluate.py` creates **local** EuroEval `DatasetConfig` objects for
+The companion `run_euroeval.py` creates **local** EuroEval `DatasetConfig` objects for
 selected public language subsets. It uses the existing instruction-following task;
 no upstream EuroEval registration or changes are needed. The Hub release is test-only,
 so the config disables training and validation splits and explicitly enables test
 split evaluation. EuroEval's default is *not* to evaluate the test split.
 
 Before running: check available GPU memory, disk space for model weights and cache,
-and the inference runtime. Use an environment with EuroEval installed as documented
-in [its custom-dataset guide](https://euroeval.com/python-package#benchmarking-custom-datasets).
-For instance, after installing EuroEval with its model-backend extras:
+and the inference runtime. EuroEval's
+[custom-dataset guide](https://euroeval.com/python-package#benchmarking-custom-datasets)
+describes local configs. On this M5, the PyPI `euroeval[generative]` extra currently
+tries to build an old CUDA-only vLLM and fails. Use a EuroEval source checkout with
+its pinned macOS `vllm-metal` dependencies installed; **do not edit EuroEval**.
+For example, from this repository, with an already-synced EuroEval checkout:
 
 ```bash
-uv run --no-project --python 3.12 --with 'euroeval[all]' \
-  paper/evaluate.py --model Qwen/Qwen2.5-1.5B-Instruct
+VLLM_METAL_MEMORY_FRACTION=0.18 uv run --project /path/to/EuroEval \
+  --no-sync --python 3.12 paper/run_euroeval.py \
+  --model Qwen/Qwen2.5-1.5B-Instruct
 ```
+
+The `0.18` budget was necessary with the memory pressure on this particular laptop;
+adjust it to available Metal memory, not total RAM. This full evaluation has not run.
 
 Defaults: Danish and English, one iteration, zero-shot, no sample bootstrapping.
 The local config maps `prompt` to EuroEval's input `text` column while retaining
 instruction IDs and kwargs for scoring. It removes null padding from each kwargs
 dictionary at retrieval time: the Hub's Parquet schema fills absent arguments with
 nulls, whereas EuroEval's constraint checkers require only applicable arguments.
-The preprocessing path was checked on Danish rows without running a model. Add
-`--language de --language fr` to cover more European languages, and repeat `--model`
-for a second
-small non-reasoning model (e.g. `Qwen/Qwen2.5-3B-Instruct`). EuroEval writes its
-results JSONL in the current directory; generated results and model caches must not
-be committed without review. These are examples, not completed measurements. Note
+A full Danish dummy-model EuroEval run passed on 3 October 2026 (524 prompts,
+EuroEval 18.1.0, 0% instruction accuracy as expected for meaningless responses).
+Reproduce this integration check without model weights using:
+
+```bash
+uv run --no-project --python 3.12 --with euroeval \
+  paper/run_euroeval.py --model dummy --language da
+```
+
+That checks dataset loading, preprocessing and scoring, **not** real model inference.
+A separate one-example M5 smoke test also completed with EuroEval 18.2.0,
+`Qwen/Qwen2.5-0.5B-Instruct`, and the Metal backend:
+
+```bash
+VLLM_METAL_MEMORY_FRACTION=0.18 uv run --project /path/to/EuroEval \
+  --no-sync --python 3.12 paper/run_euroeval.py \
+  --model Qwen/Qwen2.5-0.5B-Instruct --language da --max-examples 1
+```
+
+This returned 0% instruction accuracy on **one** prompt; that is a plumbing test,
+not a reportable score. Without the reduced Metal budget, vLLM failed with GPU
+out-of-memory while allocating its default KV cache. CUDA is **not** required.
+The `--max-examples` option labels the dataset `-smoke` and caps generated tokens;
+leave it out for real evaluations. Add `--language de --language fr` to cover more
+European languages, and repeat `--model` for a second small non-reasoning model
+(e.g. `Qwen/Qwen2.5-3B-Instruct`). EuroEval writes its results JSONL in the
+current directory; generated results and model caches must not be committed
+without review. These are examples, not completed measurements. Note
 model IDs and revisions, inference settings, dataset revision and per-language sample
 counts in the final paper. Check whether every translated constraint can be scored
 reliably before reporting aggregate scores.
