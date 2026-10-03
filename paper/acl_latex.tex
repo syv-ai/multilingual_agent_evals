@@ -28,12 +28,10 @@
 \usepackage{graphicx}
 
 
-\title{MultiIFEval: An Instruction Following Benchmark in 305 Languages}
+\title{MultiIFEval: An Instruction-Following Resource for 305 Languages}
 
-\author{Dan Saattrup Smart \\
-  Alexandra Institute \\
-  \texttt{dan.smart@alexandra.dk}\\
-}
+% No author names or acknowledgements in the review submission. Restore for camera-ready.
+\author{Anonymous submission}
 
 \begin{document}
 \maketitle
@@ -41,16 +39,17 @@
 
 \begin{abstract}
 
-We introduce MultiIFEval, a large‑scale instruction‑following benchmark that spans 305
-languages. Starting from the English IFEval dataset \cite{zhou2023ifeval}, we translate
-and localise each prompt–response pair into 305 target languages using an LLM-based
-pipeline with Wikipedia-grounded localisation. We create a manually translated Danish
-variant of the dataset and conduct human expert validation to assess quality differences
-between machine-translated and manually-translated Danish. We evaluate models on both
-machine-translated and manually-translated Danish, as well as on Estonian \cite{dorkin2025ifeval-et}
-and French \cite{alhajar2024ifeval-fr} variants from prior work. Finally, we evaluate
-multiple models across all 305 languages to establish a comprehensive baseline for
-cross-lingual instruction following capability.
+We present MultiIFEval, a publicly available translation and localisation of the
+verifiable instruction-following benchmark IFEval \cite{zhou2023ifeval} into 305
+language configurations. A structured generation pipeline adapts English-specific
+constraints, then holds the resulting instruction identifiers fixed while translating
+prompts and language-dependent constraint values. A Wikipedia article in the target
+language provides contextual text. We describe the
+released resource and its construction, and propose a focused zero-shot evaluation of
+one or two small non-reasoning models on a subset of European languages using
+EuroEval's instruction-following metric. This limited experiment is intended as a
+usage demonstration, not an all-language model ranking. Translation and constraint
+validity beyond the languages inspected remain important limitations.
 
 \end{abstract}
 
@@ -67,58 +66,26 @@ a critical limitation: as large language models are increasingly deployed across
 linguistic contexts, evaluation benchmarks confined to English fail to capture
 performance disparities that arise from multilingual instruction following.
 
-The gap between monolingual and multilingual evaluation has only partially been addressed
-by recent work. M-IFEval \cite{li2025xifbench} expanded to 3 languages, XIFBench
-\cite{he2024multi} covered 6 languages, and Multi-IF \cite{he2024multi} reached 8
-languages. More recently, Marco-Bench-MIF \cite{zeng-etal-2025-marco} extended coverage
-to 30 languages. While these efforts represent important progress, they collectively
-cover fewer than 1\% of the world's approximately 7,000 languages, leaving the vast
-majority of linguistic communities without instruction-following evaluation resources.
-This limitation is particularly acute for low-resource languages, where model behaviour
-may diverge significantly from high-resource settings due to differences in training
-data availability, tokenisation quality, and linguistic structure.
+Existing multilingual instruction-following datasets cover fewer languages:
+M-IFEval covers French, Japanese, and Spanish \cite{dussolle-etal-2025-ifeval};
+XIFBench covers six languages \cite{li2025xifbench}; and Marco-Bench-MIF covers
+30 \cite{zeng-etal-2025-marco}. These resources differ in their construction and
+evaluation procedures. Wider coverage creates new opportunities for analysis, but
+translated constraints can also become invalid or unnatural.
 
-To bridge this gap, we introduce \textbf{MultiIFEval}, a benchmark that expands IFEval
-to 305 target languages, representing an order-of-magnitude increase in multilingual
-coverage. Our methodology leverages large language models to both translate and localise
-every English prompt–response pair from the original IFEval dataset into each target
-language. Crucially, our localisation pipeline grounds translations in Wikipedia
-articles in the target language, ensuring that cultural references, proper nouns, and
-contextual examples are adapted appropriately rather than translated literally. The
-resulting dataset spans high-resource languages such as Spanish, Mandarin, and Arabic,
-as well as low-resource languages including Xhosa, Quechua, and Samoan, providing an
-unprecedented testbed for evaluating multilingual instruction following at scale.
+We introduce \textbf{MultiIFEval}, extending the English IFEval prompts and their
+verifiable constraints to 305 language configurations. The dataset is already public on Hugging Face. The reviewer-facing access link
+must be made anonymous before submission; the non-anonymous release identifier
+is recorded in the companion project notes, not this review manuscript.
+It contains test-only language subsets, including languages with very different
+amounts of available training data. Wikipedia text is supplied as translation
+context, not as evidence that the resulting examples are culturally correct.
 
-In addition to machine-translated versions, we provide a manually translated and
-localised Danish subset curated by native speakers and validated by domain experts. This
-dual approach enables systematic comparison between machine-translated and
-human-translated instruction-following benchmarks, allowing us to assess whether
-translation quality meaningfully impacts model evaluation outcomes—an aspect largely
-unexplored in prior multilingual benchmark work. We also incorporate manually translated
-Estonian \cite{dorkin2025ifeval-et} and French \cite{alhajar2024ifeval-fr} variants
-from recent independent efforts, enabling cross-lingual analysis across multiple
-European languages with human-validated translations.
-
-Our main contributions are methodological:
-
-\begin{itemize}
-\item We present a 305-language instruction-following benchmark, expanding multilingual
-  coverage from the prior maximum of 30 languages to 305, spanning languages across all
-  inhabited continents and representing diverse language families and resource levels.
-
-\item We create a manually translated and localised Danish variant, enabling direct
-  comparison between machine translation and human translation quality for instruction
-  following evaluation, with expert validation to assess the validity of
-  LLM-based translation pipelines.
-
-\item We develop a methodology for LLM-based translation with Wikipedia-grounded
-  localisation, providing a reproducible approach for adapting instruction-following
-  benchmarks to new languages while preserving cultural and contextual appropriateness.
-
-\item We establish an evaluation framework for cross-lingual instruction following that
-  will be applied across all 305 languages, enabling systematic analysis of how model
-  performance varies across language families, resource levels, and translation methods.
-\end{itemize}
+This paper contributes (1) a released multilingual resource and its construction
+pipeline, and (2) a reproducible setup for a small demonstration with existing
+instruction-following evaluation tooling. We deliberately separate breadth of
+\emph{dataset coverage} from breadth of \emph{model evaluation}: an exhaustive
+305-language leaderboard is beyond the scope of this submission.
 
 
 \section{Related Work}
@@ -130,7 +97,7 @@ Our main contributions are methodological:
 
 \paragraph{M-IFEval}
 % 3 languages, translated + language-specific
-\cite{m-ifeval2025naacl} extended IFEval to three languages---French, Japanese, and Spanish---creating M-IFEval. This work evaluated both translated versions of the original English prompts and language-specific instructions designed natively in each target language. Their evaluation of 8 LLMs revealed notable cross-lingual performance gaps, with models generally performing worse on non-English instructions even when capabilities appeared comparable on English tasks. M-IFEval demonstrated that instruction-following quality does not transfer uniformly across languages, motivating broader multilingual evaluation.
+\cite{dussolle-etal-2025-ifeval} extended IFEval to three languages---French, Japanese, and Spanish---creating M-IFEval. This work evaluated both translated versions of the original English prompts and language-specific instructions designed natively in each target language. Their evaluation of 8 LLMs revealed notable cross-lingual performance gaps, with models generally performing worse on non-English instructions even when capabilities appeared comparable on English tasks. M-IFEval demonstrated that instruction-following quality does not transfer uniformly across languages, motivating broader multilingual evaluation.
 
 \paragraph{XIFBench}
 % 6 languages, constraint-based taxonomy
@@ -142,43 +109,29 @@ Our main contributions are methodological:
 
 \paragraph{Marco-Bench-MIF}
 % 30 languages, localisation vs translation
-\cite{zeng-etal-2025-marco} represents the largest prior effort with Marco-Bench-MIF, covering 30 languages. Crucially, this work distinguished between machine translation and localisation, adapting prompts to reflect cultural context and local knowledge rather than translating literally. Their evaluation of over 20 LLMs uncovered substantial disparities: 25--35\% performance gaps between high-resource and low-resource languages, and 7--22\% gaps between machine-translated and properly localised prompts. These findings underscore that translation method meaningfully impacts evaluation outcomes and that resource disparities remain a central challenge.
-
-\paragraph{Gap}
-% Motivating our 305-language scale
-Despite this progressive expansion, prior multilingual instruction-following benchmarks have reached a maximum of 30 languages, representing less than 0.5\% of the world's approximately 7,000+ languages. MultiIFEval addresses this gap by covering 305 languages---a tenfold increase over the previous maximum---providing unprecedented coverage across diverse language families, resource levels, and geographic regions. This scale enables systematic analysis of instruction-following capabilities across the full spectrum of linguistic diversity, rather than a narrow subset of high-resource languages.
+\cite{zeng-etal-2025-marco} study translation and localisation with
+Marco-Bench-MIF in 30 languages. MultiIFEval prioritises wider language coverage
+rather than claiming comparable human validation across all languages.
 
 
 \section{Dataset Generation}
 \label{sec:dataset-generation}
 
-The MultiIFEval dataset is generated via prompting a large language model in a zero-shot
-fashion, for each sample of IFEval. The prompt contains both the instruction to
-translate and localise each English sample. To reduce the risk of hallucination when
-localising the examples, as well as to increase the quality of the translations, we
-include for each IFEval sample a randomly chosen Wikipedia page in the target language.
-We use structured generation to ensure that the output is of the correct format. The
-full prompt can be found in Figure~\ref{fig:prompt}.
+For each English IFEval example, we prompt
+Gemini-3-flash-preview~\cite{google-ai2026gemini-3-flash-preview} to translate the
+prompt and localise language-dependent constraint values. Before generation,
+English-specific constraints are adapted or removed where unsupported; the
+resulting \texttt{instruction\_id\_list} is then held fixed. The zero-shot
+prompt includes
+a randomly selected Wikipedia article in the target language as contextual text;
+this may help localisation, but does not guarantee factual or cultural accuracy.
+Figure~\ref{fig:prompt} shows the generation prompt.
 
-The structure of the generated \texttt{kwargs} deviate from the input \texttt{kwargs},
-and the reason for this is that the language model we used for generation did not
-support dictionaries as values in the JSON schema used in structured generation, so the
-is merely a rephrasing of the keyword arguments to obey this constraint.
-
-We use Gemini-3-flash-preview~\cite{google-ai2026gemini-3-flash-preview} for dataset generation with zero-shot
-prompting. Structured generation via JSON schema ensures consistent output format and
-facilitates automated validation. For each target language, we provide a randomly
-selected Wikipedia article in that language as contextual grounding. This serves two
-purposes: (1) it reduces hallucination by anchoring the model in authentic
-language-specific content, and (2) it provides cultural context that informs
-localisation decisions beyond literal translation.
-
-Localisation---adapting content to a specific culture and locale---is essential for
-instruction-following benchmarks. Direct translation often preserves source-culture
-references (e.g., holidays, currencies, place names, cultural practices) that feel
-foreign or unnatural to native speakers. Our localisation approach asks the model to
-adapt prompts so they read as if originally authored in the target language, replacing
-Anglocentric examples with culturally appropriate equivalents.
+The generation schema represents \texttt{kwargs} as lists of name--value pairs
+because the model's structured-output schema did not support dictionary-valued
+fields. We convert these back to the evaluator's expected constraint metadata.
+A valid JSON shape alone cannot establish that the translated prompt and its
+machine-checkable constraints still mean the same thing.
 
 
 \begin{figure*}[h]
@@ -203,7 +156,7 @@ You need to translate the example to {target_language}. This means the following
    should _only_ be changed if they contain English words or phrases, which would need
    to be changed to the equivalent in {target_language}.
 
-Here is an example of some text written in {language.name}:
+Here is an example of some text written in {target_language}:
 
 <{target_language_code}_example>
 {wikipedia_article_in_target_language}
@@ -212,7 +165,7 @@ Here is an example of some text written in {language.name}:
 You should return the translated example in JSON format, with the following structure:
 
 - `new_prompt` (str): The translated prompt.
-- `new_instruction_id_list` (list[str]): The translated instruction ID list.
+- `new_instruction_id_list` (list[str]): The unchanged input instruction IDs.
 - `new_kwargs` (list[list[dict]]): The translated keyword arguments.
 
 Here the `new_kwargs` must be a list of the same length as the
@@ -229,94 +182,87 @@ instruction ID in the `new_instruction_id_list`.
 \subsection{Manual Danish Translation}
 \label{sec:manual-danish-translation}
 
-To validate the quality of machine-translated samples, we created a manually translated
-and localised Danish subset of IFEval. Two native Danish speakers on our research team
-translated all prompts, with careful attention to localisation: cultural references
-were adapted to Danish contexts (e.g., replacing American holidays with Danish
-traditions, converting measurements to metric, using Danish place names and currency).
-The manual translation serves as a gold standard against which we evaluate the machine
-translation quality in Section~\ref{sec:comparison}.
-
-Danish was selected for manual translation for two reasons: first, it is well-represented
-in training corpora, making it an informative test case for machine translation
-quality; second, having native speakers on our team enabled rigorous manual validation
-without external contracting costs or delays.
+Two native Danish speakers also prepared a manual Danish translation of IFEval.
+This provides a potential reference for a targeted translation-quality check,
+subject to alignment of prompt IDs, availability of the manual data, and a
+reported validation protocol. We do not treat a manual translation as an
+error-free gold standard or assert unreported human-validation results.
 
 \subsection{Machine Translated Dataset}
 \label{sec:mt-dataset}
 
-We generated machine-translated versions of IFEval for 305 languages using the prompt
-template shown in Figure~\ref{fig:prompt}. For each language, we selected a
-contemporary Wikipedia article at random to provide contextual grounding. The
-structured generation pipeline enforces strict preservation of \texttt{instruction\_id\_list}
-values, ensuring traceability to original English samples. The \texttt{kwargs} are
-reformulated as lists of name--value pairs to comply with the JSON schema constraints
-of the generation model.
-
-Quality control is enforced at multiple levels: (1) the JSON schema guarantees valid
-output structure; (2) we validate that all instruction IDs from the source are present
-in the output; (3) we verify that kwargs retain their original keys, with only values
-modified where localisation is appropriate. Due to model limitations, a small subset
-of languages yielded empty or malformed outputs; these are excluded from the released
-dataset. The final MultiIFEval corpus covers 305 languages with varying sample counts
-depending on source availability and generation success rate.
+The public Hub release has 305 language configurations with a \texttt{test}
+split and the columns \texttt{key}, \texttt{prompt},
+\texttt{instruction\_id\_list}, and \texttt{kwargs}. Each config contains a
+subset of the original prompts: generation or validation failures may remove
+individual examples. The number of examples per language and the handling of
+missing examples should be reported from a pinned release before submission.
+The dataset's licence is CC BY-NC-SA 4.0. Automatic structure and ID checks do
+not substitute for assessing semantic preservation or native-speaker quality.
 
 
-\section{Experiment Setup}
+\section{Focused Evaluation}
 \label{sec:evaluation}
 
-We evaluate a range of language models on MultiIFEval to assess instruction-following capabilities across languages. Our evaluation focuses on decoder-only models, which represent the dominant architecture for instruction-following tasks, while including encoder models for comparative analysis.
+We plan a deliberately small demonstration of the released resource rather than a
+full 305-language model survey. The initial comparison uses Danish and English
+as a reference pair; German and French can be added if compute permits. We
+will evaluate one or two small, instruction-tuned, non-reasoning decoder models
+(e.g., Qwen2.5-1.5B-Instruct and Qwen2.5-3B-Instruct), with no few-shot examples.
+The final submission must name exact model and dataset revisions, inference
+settings, sample counts, and hardware. We do not use encoder-only models for
+generative instruction following.
 
-\paragraph{Models}
-We evaluate multiple decoder-only models, including Llama-3.1-8B variants and other open-weight models of comparable scale. For comparison, we also include encoder-based models to examine architectural differences in multilingual instruction following. All models are evaluated in a zero-shot setting without task-specific fine-tuning.
+\paragraph{Reproducibility}
+We will use EuroEval's existing instruction-following task with \emph{local}
+\texttt{DatasetConfig} objects referencing the public language-specific Hub
+configs; no changes to EuroEval are required. Its checker consumes the
+\texttt{prompt}, \texttt{instruction\_id\_list}, and \texttt{kwargs} fields.
+The local configuration and example invocation are included with this paper.
+We will report EuroEval's instruction-accuracy metric, the number of evaluated
+examples and applicable constraints, and any scorer incompatibilities or
+language-dependent checking errors. Scores for these few languages cannot
+support conclusions about the remaining language configurations.
 
-\paragraph{Evaluation Approach}
-Each model is evaluated on each language variant of MultiIFEval using zero-shot instruction following. Models receive instructions in the target language and must generate responses that satisfy the specified constraints. We do not provide examples or demonstrations, ensuring evaluation measures inherent multilingual capabilities rather than in-context learning.
+\paragraph{Planned results (not yet measured)}
+Insert a table of actual per-model, per-language scores with sample sizes,
+followed by a short error analysis of constraint mismatches and translation
+artefacts. Do not infer cross-lingual model rankings from unrun experiments.
+If the manual Danish dataset and a documented assessment are available, add
+an aligned, small qualitative comparison; otherwise omit human-validation
+claims. The published English and Danish configurations are not themselves
+manual-versus-machine parallel evaluations.
 
-\paragraph{Metrics}
-Following the original IFEval methodology, we measure constraint satisfaction using binary pass/fail scoring per instruction. A model receives a pass only if its response satisfies all constraints specified in the instruction. We report both per-instruction accuracy and aggregate scores across constraint types.
+\section{Limitations and Ethical Considerations}
+\label{sec:limitations}
 
-\paragraph{Cross-lingual Analysis}
-Our analysis examines performance patterns across language families, writing systems, and resource levels. We compare high-resource languages (e.g., French, German) against low-resource languages (e.g., minority African and Indigenous languages) to identify disparities in model capabilities. We also analyze whether performance correlates with language family membership or geographical proximity.
-
-\paragraph{Comparison with MultiWikiQA}
-As optional analysis, we examine correlation between MultiIFEval performance and MultiWikiQA scores, using the latter as a proxy for general language understanding. This comparison helps distinguish instruction-following specific capabilities from broader multilingual competence.
-
-\section{Comparison of Machine vs Manual Translations}
-\label{sec:comparison}
-
-A key question in multilingual benchmark construction is whether machine translation produces evaluation datasets comparable to manual human translation. We analyze quality differences between our machine-translated datasets and manually-translated variants across three languages: Danish (our new manual translation), Estonian \cite{dorkin2025ifeval-et}, and French \cite{m-ifeval2025naacl}.
-
-\paragraph{Manual Validation Methodology}
-For Danish, we conduct expert validation comparing machine-translated and manually-translated instructions. Native Danish speakers with expertise in NLP evaluate both versions for: (1) naturalness and fluency, (2) preservation of constraint semantics, (3) cultural appropriateness of localized content, and (4) overall usability for evaluation purposes. Validators rate each instruction on Likert scales and provide qualitative feedback on problematic cases.
-
-\paragraph{Cross-language Analysis}
-We reference existing manual evaluations of Estonian \cite{dorkin2025ifeval-et} and French \cite{m-ifeval2025naacl} IFEval variants to contextualize our Danish findings. While each manual translation employed slightly different validation protocols, all three provide expert assessment of machine translation quality for instruction-following benchmarks.
-
-\paragraph{Expected Analysis}
-Our analysis will examine whether machine translation introduces systematic biases or errors that affect evaluation validity. We will compare model performance rankings on machine-translated versus manually-translated datasets to assess whether translation method affects relative model comparisons. We hypothesize that machine translation performs adequately for high-resource languages but may introduce artifacts in low-resource languages or for culturally-specific content.
+The broad language coverage comes from automated translation, not equivalent
+native-speaker validation in 305 languages. Wikipedia context may not match a
+prompt's subject, and translated constraints (e.g., word counts or keywords)
+may change difficulty or even become impossible. Availability of a language
+configuration does not establish evaluation validity for that language.
+The proposed demonstration covers only a few European languages and small
+non-reasoning models; its findings must not be generalised to all language
+communities or model families. The released dataset carries a
+CC BY-NC-SA 4.0 licence; downstream users should review its terms.
 
 \section{Conclusion}
 \label{sec:conclusion}
 
-We present MultiIFEval, an instruction-following benchmark spanning 305 languages, enabling evaluation of multilingual models at unprecedented scale. Our dataset combines machine-translated coverage across all languages with manually-translated, expert-validated variants for selected languages.
+MultiIFEval makes IFEval-style prompts and machine-checkable constraints
+available in 305 language configurations. We document the public release and
+an intentionally limited evaluation route. Broader model evaluation and
+language-specific human quality assessment remain future work.
 
-MultiIFEval addresses a critical gap in multilingual NLP evaluation by providing standardized instruction-following assessment across diverse languages and writing systems. We expect this resource to support research on multilingual instruction tuning, cross-lingual generalization, and equitable model development across language communities.
-
-Future work includes expanding manual translations to additional languages, developing culturally-adapted instructions beyond translation, and conducting comprehensive evaluation across the full model ecosystem. We plan to release MultiIFEval publicly to support the broader research community.
-
-\section{Acknowledgements}
-\label{sec:acknowledgements}
-
-We thank the anonymous reviewers for their feedback. This work was supported by the Alexandra Institute.
-
-\bibliography{custom,anthology}
+% Add authors, affiliations and acknowledgements only in the camera-ready version.
+\bibliography{custom}
 
 \appendix
-
-\section{Appendix}
+\section{Evaluation Configuration}
 \label{sec:appendix}
-
-The appendix contains full evaluation results across all 305 languages, including per-language scores, per-constraint-type breakdowns, and additional analysis of cross-lingual performance patterns.
+The companion local configuration demonstrates how to select a released
+language subset and invoke EuroEval without registering a dataset upstream.
+Replace this appendix with additional error examples or validation details
+if they are available by submission.
 
 \end{document}

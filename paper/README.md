@@ -1,0 +1,71 @@
+# NoDaLiDa 2027 submission
+
+The [official call](https://eventsignup.ku.dk/nodalida-27/call-for-papers)
+requires ACL style files; `acl_latex.tex` already uses `acl.sty` in `review` mode.
+The companion `acl_natbib.bst` is bundled from the official ACL style-files repo
+(revision `d5adc823ff0f80f98c80405ca0ab66c68e684409`). There is no separate
+NoDaLiDa LaTeX template. The current draft is aimed at a
+**regular paper** (up to eight content pages; references, optional limitations and
+ethical considerations sections excluded). A four-page short or demonstration paper
+would require further cuts. Appendices are optional and reviewers need not read them.
+Check the current call again before submitting; the direct-submission deadline is
+**18 January 2027**, ARR commitment **22 February 2027**, and camera-ready
+**5 April 2027**. Submit via OpenReview when the link becomes available.
+
+Keep the review PDF anonymous: do not restore the author block, identify the team in
+acknowledgements, or link directly to the released Hub repository, whose commit
+history identifies the uploader. Arrange a reviewer-accessible anonymous copy or
+other CFP-compliant access method before submission. For camera-ready, restore the
+original public URL, accurate author affiliations and acknowledgements. The dataset
+has already been released at
+<https://huggingface.co/datasets/danish-foundation-models/multi-ifeval> under
+CC BY-NC-SA 4.0. The live Hub split listing currently exposes 305 language
+configurations; pin a Hub commit and check counts before making precise claims.
+
+## Small evaluation (not yet run)
+
+The companion `evaluate.py` creates **local** EuroEval `DatasetConfig` objects for
+selected public language subsets. It uses the existing instruction-following task;
+no upstream EuroEval registration or changes are needed. The Hub release is test-only,
+so the config disables training and validation splits and explicitly enables test
+split evaluation. EuroEval's default is *not* to evaluate the test split.
+
+Before running: check available GPU memory, disk space for model weights and cache,
+and the inference runtime. Use an environment with EuroEval installed as documented
+in [its custom-dataset guide](https://euroeval.com/python-package#benchmarking-custom-datasets).
+For instance, after installing EuroEval with its model-backend extras:
+
+```bash
+uv run --no-project --python 3.12 --with 'euroeval[all]' \
+  paper/evaluate.py --model Qwen/Qwen2.5-1.5B-Instruct
+```
+
+Defaults: Danish and English, one iteration, zero-shot, no sample bootstrapping.
+The local config maps `prompt` to EuroEval's input `text` column while retaining
+instruction IDs and kwargs for scoring. It removes null padding from each kwargs
+dictionary at retrieval time: the Hub's Parquet schema fills absent arguments with
+nulls, whereas EuroEval's constraint checkers require only applicable arguments.
+The preprocessing path was checked on Danish rows without running a model. Add
+`--language de --language fr` to cover more European languages, and repeat `--model`
+for a second
+small non-reasoning model (e.g. `Qwen/Qwen2.5-3B-Instruct`). EuroEval writes its
+results JSONL in the current directory; generated results and model caches must not
+be committed without review. These are examples, not completed measurements. Note
+model IDs and revisions, inference settings, dataset revision and per-language sample
+counts in the final paper. Check whether every translated constraint can be scored
+reliably before reporting aggregate scores.
+
+## Before submission
+
+- Run the small evaluation and add **actual** scores, sample counts, scorer errors,
+  and a few inspected failures to the paper. Otherwise remove result promises.
+- Verify the released config inventory and per-language missing examples against a
+  pinned Hub revision. State that 305 configs do not imply 305 validated translations.
+- If using the manual Danish translation, document availability, alignment and
+  validation protocol; otherwise omit the human-validation claim entirely.
+- Replace the review manuscript's access-link note with an anonymous working
+  resource link. The draft is not yet ready to submit without results and this link.
+- Inspect the PDF for page limit, citation resolution, anonymity and layout. A TeX
+  toolchain is not installed in this checkout, so PDF compilation is still pending.
+- Check the current ACL style-file release before final submission. Only replace the
+  bundled `acl.sty` if the NoDaLiDa organisers require a newer revision.
