@@ -28,7 +28,7 @@
 \usepackage{graphicx}
 
 
-\title{MultiIFEval: An Instruction-Following Resource for 305 Languages}
+\title{MultiIFEval and MultiBFCL: Multilingual Instruction Following and Tool Use}
 
 % No author names or acknowledgements in the review submission. Restore for camera-ready.
 \author{Anonymous submission}
@@ -39,17 +39,17 @@
 
 \begin{abstract}
 
-We present MultiIFEval, a publicly available translation and localisation of the
-verifiable instruction-following benchmark IFEval \cite{zhou2023ifeval} into 305
-language configurations. A structured generation pipeline adapts English-specific
-constraints, then holds the resulting instruction identifiers fixed while translating
-prompts and language-dependent constraint values. A Wikipedia article in the target
-language provides contextual text. We describe the
-released resource and its construction, and propose a focused zero-shot evaluation of
-one or two small non-reasoning models on a subset of European languages using
-EuroEval's instruction-following metric. This limited experiment is intended as a
-usage demonstration, not an all-language model ranking. Translation and constraint
-validity beyond the languages inspected remain important limitations.
+We describe two distinct multilingual resources for evaluating agent-relevant
+capabilities: MultiIFEval for verifiable instruction following and MultiBFCL for
+tool calling. MultiIFEval is publicly released in 305 language configurations,
+translated from IFEval \cite{zhou2023ifeval}. MultiBFCL is an ongoing translation
+of the BFCL-v2 subsets distributed with the upstream BFCL-v4 files
+\cite{bfcl-upstream}; its language coverage, validation, and release status are
+not yet final. The pipelines use target-language context but preserve different
+parts of their source tasks. We outline separate, limited evaluation protocols
+rather than claiming comprehensive model results or equivalent quality across
+languages. This draft is a combined resource-paper framework, not a completed
+benchmark comparison.
 
 \end{abstract}
 
@@ -73,19 +73,19 @@ XIFBench covers six languages \cite{li2025xifbench}; and Marco-Bench-MIF covers
 evaluation procedures. Wider coverage creates new opportunities for analysis, but
 translated constraints can also become invalid or unnatural.
 
-We introduce \textbf{MultiIFEval}, extending the English IFEval prompts and their
-verifiable constraints to 305 language configurations. The dataset is already public on Hugging Face. The reviewer-facing access link
-must be made anonymous before submission; the non-anonymous release identifier
-is recorded in the companion project notes, not this review manuscript.
-It contains test-only language subsets, including languages with very different
-amounts of available training data. Wikipedia text is supplied as translation
-context, not as evidence that the resulting examples are culturally correct.
+We present two separate datasets rather than a single combined benchmark.
+\textbf{MultiIFEval} extends English IFEval prompts and verifiable constraints to
+305 language configurations and is already public on Hugging Face.
+\textbf{MultiBFCL} adapts the BFCL-v2 tool-calling subsets to other languages;
+translation is still in progress. Both use examples of target-language text as
+context, but their fields, checkers, and validation needs differ. A reviewer-facing
+anonymous access route for any released resource remains to be arranged.
 
-This paper contributes (1) a released multilingual resource and its construction
-pipeline, and (2) a reproducible setup for a small demonstration with existing
-instruction-following evaluation tooling. We deliberately separate breadth of
-\emph{dataset coverage} from breadth of \emph{model evaluation}: an exhaustive
-305-language leaderboard is beyond the scope of this submission.
+This paper's contribution is the construction and analysis of two complementary
+multilingual evaluation resources. Dataset coverage is not evidence of model
+performance: we propose only a small instruction-following demonstration and a
+separate, still-to-be-established tool-use evaluation protocol. Neither a joint
+score nor an all-language leaderboard is claimed.
 
 
 \section{Related Work}
@@ -113,8 +113,14 @@ instruction-following evaluation tooling. We deliberately separate breadth of
 Marco-Bench-MIF in 30 languages. MultiIFEval prioritises wider language coverage
 rather than claiming comparable human validation across all languages.
 
+\paragraph{Function calling}
+BFCL \cite{bfcl-upstream} assesses whether models select tools and produce
+valid arguments across several categories. Its v2 subsets are distributed with
+the current v4 file layout. Translating the user-facing instruction while
+retaining tool metadata creates a different cross-lingual evaluation problem
+from translating IFEval's verifiable response constraints.
 
-\section{Dataset Generation}
+\section{MultiIFEval: Instruction Following}
 \label{sec:dataset-generation}
 
 For each English IFEval example, we prompt
@@ -201,8 +207,33 @@ The dataset's licence is CC BY-NC-SA 4.0. Automatic structure and ID checks do
 not substitute for assessing semantic preservation or native-speaker quality.
 
 
-\section{Focused Evaluation}
+\section{MultiBFCL: Tool Calling}
+\label{sec:multi-bfcl}
+
+MultiBFCL translates the BFCL-v2 categories retained in the BFCL-v4 upstream
+file layout \cite{bfcl-upstream}. The source loader currently selects ten
+single-turn categories, including simple, parallel, multiple, and live variants,
+from the upstream input and possible-answer files. These files are currently
+fetched from a moving upstream branch; the source commit and exact subset counts
+must be pinned before submission. The project obtains candidate language codes
+from MultiWikiQA and intersects them with its own language definitions; this
+does not yet establish the same final 305-language inventory as MultiIFEval.
+
+The translation prompt provides a target-language context excerpt and asks an
+LLM for a translated instruction. In the current implementation only the first
+message's content is translated, plus the second message when the first is a
+system message. Function signatures, descriptions, and other fields are not
+translated. Translations are appended to per-language JSONL checkpoints that
+can be resumed by example ID. Structured output validates the shape of the
+translation, not whether it preserves the intended call or argument semantics.
+MultiBFCL is in progress; this draft does not assert that its datasets are
+complete, published, or human-validated. Any release will require a licence and
+provenance review of the upstream data and target-language context.
+
+\section{Evaluation Plan}
 \label{sec:evaluation}
+
+\subsection{MultiIFEval demonstration}
 
 We plan a deliberately small demonstration of the released resource rather than a
 full 305-language model survey. The initial comparison uses Danish and English
@@ -233,6 +264,18 @@ an aligned, small qualitative comparison; otherwise omit human-validation
 claims. The published English and Danish configurations are not themselves
 manual-versus-machine parallel evaluations.
 
+\subsection{MultiBFCL evaluation}
+
+A tool-use experiment needs its own protocol: select a frozen translated subset,
+run a small non-reasoning model with the relevant tool definitions, and score its
+calls against the corresponding BFCL possible answers using an appropriate
+upstream-compatible checker. Prompt translation alone does not make the
+original answers valid across languages. Before reporting scores, verify
+alignment by ID, exact-match or execution semantics for each selected category,
+and whether untranslated tool descriptions leak English task cues. No MultiBFCL
+model evaluation has been run for this paper; do not use MultiIFEval instruction
+accuracy as a proxy for tool-call correctness.
+
 \section{Limitations and Ethical Considerations}
 \label{sec:limitations}
 
@@ -241,18 +284,24 @@ native-speaker validation in 305 languages. Wikipedia context may not match a
 prompt's subject, and translated constraints (e.g., word counts or keywords)
 may change difficulty or even become impossible. Availability of a language
 configuration does not establish evaluation validity for that language.
-The proposed demonstration covers only a few European languages and small
-non-reasoning models; its findings must not be generalised to all language
-communities or model families. The released dataset carries a
-CC BY-NC-SA 4.0 licence; downstream users should review its terms.
+MultiBFCL's translated prompts are still being generated and lack a documented
+human-quality study, a fixed upstream source revision, and a completed evaluation
+pipeline. Leaving tool metadata in English may confound multilingual tool-use
+scores. The proposed MultiIFEval demonstration covers only a few European
+languages and small non-reasoning models; its findings cannot be generalised
+to all language communities or model families. The released MultiIFEval dataset
+carries a CC BY-NC-SA 4.0 licence; rights for redistributing MultiBFCL's
+source-derived data must be established separately.
 
 \section{Conclusion}
 \label{sec:conclusion}
 
-MultiIFEval makes IFEval-style prompts and machine-checkable constraints
-available in 305 language configurations. We document the public release and
-an intentionally limited evaluation route. Broader model evaluation and
-language-specific human quality assessment remain future work.
+MultiIFEval and MultiBFCL target different components of multilingual agent
+behaviour: following verifiable instructions and selecting tool calls. The
+former is released in 305 language configurations; the latter is an ongoing
+BFCL-v2 subset translation. A combined paper will be ready only after the
+MultiBFCL source and release are pinned, both resources' validity is assessed,
+and separate limited evaluations are reported.
 
 % Add authors, affiliations and acknowledgements only in the camera-ready version.
 \bibliography{custom}

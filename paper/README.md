@@ -1,5 +1,12 @@
 # NoDaLiDa 2027 submission
 
+The draft now treats **MultiIFEval and MultiBFCL as separate multilingual agentic
+evaluation datasets** in one paper, not as a single newly named dataset. MultiIFEval
+is released; MultiBFCL's BFCL-v2 subset translations and evaluation protocol are
+still in progress. The codebase merger into a proposed `multilingual_agent_evals`
+repository is deferred until active translation jobs finish; see [the migration
+plan](MIGRATION.md). No repository has been renamed or merged yet.
+
 The [official call](https://eventsignup.ku.dk/nodalida-27/call-for-papers)
 requires ACL style files; `acl_latex.tex` uses `acl.sty` in `review` mode.
 The bundled `acl.sty` matches the latest official ACL style-files repo revision
@@ -87,8 +94,12 @@ reliably before reporting aggregate scores.
 
 ## Before submission
 
-- Run the small evaluation and add **actual** scores, sample counts, scorer errors,
-  and a few inspected failures to the paper. Otherwise remove result promises.
+- Run the small MultiIFEval evaluation and add **actual** scores, sample counts,
+  scorer errors, and inspected failures. A one-example M5 smoke test is not a result.
+- For MultiBFCL, pin the upstream BFCL commit and completed subset inventory,
+  check translation quality and data rights, establish a tool-call scoring protocol,
+  and run a separate limited model evaluation. Do not claim a release or scores
+  before they exist.
 - Verify the released config inventory and per-language missing examples against a
   pinned Hub revision. State that 305 configs do not imply 305 validated translations.
 - If using the manual Danish translation, document availability, alignment and
