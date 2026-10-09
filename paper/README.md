@@ -67,8 +67,8 @@ EuroEval 18.1.0, 0% instruction accuracy as expected for meaningless responses).
 Reproduce this integration check without model weights using:
 
 ```bash
-uv run --no-project --python 3.12 --with euroeval \
-  paper/run_euroeval.py --model dummy --language da
+uv run --python 3.12 --locked paper/run_euroeval.py \
+  --model dummy --language da
 ```
 
 That checks dataset loading, preprocessing and scoring, **not** real model inference.
@@ -103,8 +103,8 @@ repositories or change EuroEval. A fresh one-example Danish dummy-model run
 passed on 9 October 2026 (0% tool-calling accuracy, not a model result):
 
 ```bash
-uv run --no-project --python 3.12 --with euroeval \
-  paper/run_multibfcl.py --model dummy --language da --max-examples 1
+uv run --python 3.12 --locked paper/run_multibfcl.py \
+  --model dummy --language da --max-examples 1
 ```
 
 For a real small non-reasoning model on this M5, use a synced EuroEval source

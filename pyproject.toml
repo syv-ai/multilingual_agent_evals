@@ -14,13 +14,14 @@ dependencies = [
     "bits-and-bobs>=0.2.0",
     "click>=8.3.1",
     "datasets>=4.8.4",
+    "euroeval==18.3.0",
     "litellm>=1.82.6",
     "loguru>=0.7.3",
     "matplotlib>=3.10.0",
     "numpy>=2.2.0",
     "pandas>=2.3.0",
     "pydantic>=2.12.5",
-    "python-dotenv>=1.2.1",
+    "python-dotenv>=1.0.1",
 ]
 
 [project.urls]

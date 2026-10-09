@@ -3,8 +3,7 @@ r"""EuroEval registrations for the public MultiBFCL languages missing in v18.3.
 EuroEval loads DatasetConfig instances from this file automatically when run
 from the repository root. Select a dataset explicitly, for example:
 
-    uv run --no-project --python 3.12 --with euroeval==18.3.0 \
-        euroeval --dataset multi-bfcl-ab --model dummy \
+    uv run euroeval --dataset multi-bfcl-ab --model dummy \
         --evaluate-test-split --num-iterations 1 --no-save-results
 
 Do not run EuroEval without --dataset: that may benchmark every compatible

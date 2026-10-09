@@ -18,6 +18,7 @@ Preserve the Alexandra Institute attribution in `LICENSE`.
 uv sync --python 3.12 --locked --all-extras --dev
 uv run --python 3.12 --locked pytest
 uv run --python 3.12 --locked pre-commit run --all-files
+uv run euroeval --help
 ```
 
 Translation requires a model API key and may spend money. Do not run translation
@@ -39,6 +40,9 @@ blocker instead of bypassing branch protection.
 ## Gotchas
 
 - Use Python 3.12 explicitly: newer defaults can fail on locked dependencies.
+  EuroEval 18.3.0 transitively pins `python-dotenv==1.0.1`; the project only
+  calls `load_dotenv()`. Do not raise its direct lower bound until the upstream
+  dependency allows it.
 - MultiBFCL's BFCL-v2 category files are named `BFCL_v4_*` upstream. The loader
   currently follows upstream `main`; pin the source before claiming a reproducible
   release. Its translation does not translate tool metadata.
