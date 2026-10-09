@@ -30,10 +30,11 @@ uv run --python 3.12 --locked src/scripts/translate_bfcl.py --help
 
 ## Git workflow
 
-Work directly on `main` and push commits to `origin/main`. Check for a clean,
-up-to-date main checkout before editing. Do not overwrite other work, force-push,
-or use worktrees for routine changes. Use Conventional Commit messages. If direct
-pushes are blocked, report the blocker instead of bypassing branch protection.
+The owner explicitly authorises direct work on `main` and pushes to
+`origin/main`. Check for a clean, up-to-date main checkout before editing.
+Do not overwrite other work, force-push, or use worktrees for routine changes.
+Use Conventional Commit messages. If direct pushes are blocked, report the
+blocker instead of bypassing branch protection.
 
 ## Gotchas
 
@@ -51,8 +52,11 @@ pushes are blocked, report the blocker instead of bypassing branch protection.
   call and may wait 60 seconds on a rate limit. Keep API keys and local caches
   out of Git.
 - EuroEval's 31 translated BFCL registrations plus English constitute its
-  32-language tool-calling support. Its derived `EuroEval/multi-bfcl-*-mini`
-  repositories may be private; registration is not a published model result.
+  32-language tool-calling support. Root `custom_datasets.py` adds the other
+  273 public MultiBFCL languages via EuroEval's local custom-dataset loader;
+  always select `--dataset` explicitly to avoid evaluating every compatible
+  dataset. The built-in derived minis may be private; registration is not a
+  published model result.
 - In `paper/`, `run_euroeval.py` is named deliberately: a file named
   `evaluate.py` shadows EuroEval's `evaluate` dependency. The separate
   `run_multibfcl.py` locally converts the public BFCL data; EuroEval's current
