@@ -28,19 +28,19 @@ only after the combined repository is verified.
   translated BFCL languages plus English, but its derived mini repositories
   may be private. No model scores were created as part of this migration.
 
-## Public cutover checklist
+## Public cutover status (9 October 2026)
 
-1. Re-run locked tests, pre-commit, both CLI help commands and `git diff --check`.
-   Ensure neither secrets nor checkpoint JSONL files are staged. Verify both
-   source Git SHAs are ancestors of the integration commit.
-2. Push the tested combined `main` without force to the existing
-   `syv-ai/multi_ifeval` remote. Confirm the remote commit and CI. Rename that
-   repository to `syv-ai/multilingual_agent_evals`, update the local `origin`,
-   and verify a fresh fetch and links at the new URL.
-3. Verify the old BFCL history is reachable in the new repo and retain its
-   local checkout and backup. Only then retire `syv-ai/multi_bfcl`. Git history
-   can be recreated from the bundle, but deletion loses issues, stars, settings,
-   and the old URL. Do not delete on a failed check.
+- Locked Python 3.12 tests (21 passed), pre-commit, both CLI help commands,
+  `git diff --check`, and the source/wheel build passed. The wheel contains
+  both packages. Only `data/.gitkeep`, not JSONL or secrets, entered Git.
+- Published the combined `main` as commit `5be9fdc` without force, then
+  renamed the repository to `syv-ai/multilingual_agent_evals`. Verified
+  `origin/main` at the new URL points to that commit and the BFCL source SHA
+  remains an ancestor. The Hugging Face dataset IDs did not change.
+- **Still gated:** verify CI at the new repository before deleting
+  `syv-ai/multi_bfcl`. The old checkout and Git bundle must be retained even
+  after any remote deletion. Deletion loses the old URL, issues, stars and
+  settings; a Git bundle only restores source history.
 
 ## Independent data and paper work still required
 
