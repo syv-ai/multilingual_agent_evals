@@ -114,6 +114,7 @@ site/
 # Generated files
 data/ifeval-*.jsonl
 data/bfcl-*.jsonl
+data/evaluations/
 
 # LaTeX
 **/*.aux

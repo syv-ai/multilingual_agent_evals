@@ -61,6 +61,10 @@ blocker instead of bypassing branch protection.
   always select `--dataset` explicitly to avoid evaluating every compatible
   dataset. The built-in derived minis may be private; registration is not a
   published model result.
+- With EuroEval `--api-base`, its dummy proxy key can make public BFCL Hub data
+  appear gated. Export the pinned test subset to ignored `data/evaluations/`
+  CSV and use `paper/run_multibfcl.py --local-csv-dir`; never pass a Hub token
+  to the model proxy.
 - In `paper/`, `run_euroeval.py` is named deliberately: a file named
   `evaluate.py` shadows EuroEval's `evaluate` dependency. The separate
   `run_multibfcl.py` locally converts the public BFCL data; EuroEval's current

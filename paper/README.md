@@ -115,6 +115,14 @@ text-to-text implementation requires the bootstrap path when there are no
 cached outputs; consequently a full MultiBFCL run samples with replacement
 and may not evaluate every distinct public row. Record the dataset revision,
 bootstrap seed, number of draws, unique IDs covered, and any scorer errors.
+For a model served through an OpenAI-compatible proxy, pass `--api-base` and
+`--generative-type reasoning` when schema-constrained responses are unsupported.
+EuroEval can mistake the proxy's dummy API key for a Hub token and report the
+public BFCL release as gated. In that case, export the release's pinned `test`
+split to CSV under ignored `data/evaluations/` and supply `--local-csv-dir`.
+For cross-language comparisons, supply one ordered JSON list of common source
+IDs with `--sample-ids-file`; public subsets need not have the same row order.
+Record the source revision, exported CSV checksums and bootstrap coverage.
 A one-example smoke run does not establish the model's BFCL accuracy.
 
 ## Before submission
