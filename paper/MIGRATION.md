@@ -37,10 +37,13 @@ only after the combined repository is verified.
   renamed the repository to `syv-ai/multilingual_agent_evals`. Verified
   `origin/main` at the new URL points to that commit and the BFCL source SHA
   remains an ancestor. The Hugging Face dataset IDs did not change.
-- **Still gated:** verify CI at the new repository before deleting
-  `syv-ai/multi_bfcl`. The old checkout and Git bundle must be retained even
-  after any remote deletion. Deletion loses the old URL, issues, stars and
-  settings; a Git bundle only restores source history.
+- Manual CI run `37917702180` passed code checks and pytest on Linux, macOS,
+  and Windows. The old `syv-ai/multi_bfcl` repository was archived by the
+  owner, not deleted; it remains a read-only historical pointer. The local
+  checkout and Git bundle are retained. No CLI deletion permission was added.
+- The paper also has a local public-Hub MultiBFCL EuroEval conversion script;
+  a one-example Danish dummy-model run reached tool-calling scoring. This is
+  only an integration smoke test, not a reportable model result.
 
 ## Independent data and paper work still required
 

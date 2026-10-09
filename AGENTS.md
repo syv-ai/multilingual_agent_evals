@@ -54,5 +54,8 @@ pushes are blocked, report the blocker instead of bypassing branch protection.
   32-language tool-calling support. Its derived `EuroEval/multi-bfcl-*-mini`
   repositories may be private; registration is not a published model result.
 - In `paper/`, `run_euroeval.py` is named deliberately: a file named
-  `evaluate.py` shadows EuroEval's `evaluate` dependency. The paper is still a
-  draft without full model results or an anonymous reviewer-accessible release.
+  `evaluate.py` shadows EuroEval's `evaluate` dependency. The separate
+  `run_multibfcl.py` locally converts the public BFCL data; EuroEval's current
+  text-to-text scorer needs bootstrap sampling to retain an empty cache's
+  reference schema, so count unique sampled IDs before reporting a result.
+  The paper still lacks full model results and anonymous reviewer access.

@@ -52,11 +52,13 @@ listed separately above.
 
 ## Evaluation and paper
 
-MultiIFEval can be used through a local EuroEval configuration; see
-[`paper/run_euroeval.py`](paper/run_euroeval.py). EuroEval has BFCL-v2 English and
-31 translated MultiBFCL language registrations for its separate `tool-calling`
-metric. Its derived mini datasets may require access, so the public MultiBFCL
-Hub release is the authoritative data source. Neither task's registration is a
-model score. The [combined NoDaLiDa draft](paper/acl_latex.tex) keeps both tasks,
-methods, metrics, and limitations distinct; reported model results still need to
-be collected and checked.
+Both resources can use local EuroEval configurations: see
+[`paper/run_euroeval.py`](paper/run_euroeval.py) for MultiIFEval and
+[`paper/run_multibfcl.py`](paper/run_multibfcl.py) for the public MultiBFCL
+release. EuroEval has BFCL-v2 English and 31 translated MultiBFCL language
+registrations for its separate `tool-calling` metric. Its derived mini datasets
+may require access, so the public MultiBFCL Hub release is the data source.
+Neither task's registration is a model score. The
+[combined NoDaLiDa draft](paper/acl_latex.tex) keeps both tasks, methods,
+metrics, and limitations distinct; reported model results still need to be
+collected and checked.

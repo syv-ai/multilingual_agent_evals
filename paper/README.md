@@ -94,6 +94,29 @@ model IDs and revisions, inference settings, dataset revision and per-language s
 counts in the final paper. Check whether every translated constraint can be scored
 reliably before reporting aggregate scores.
 
+## MultiBFCL local evaluation
+
+`run_multibfcl.py` selects a public `syvai/multi-bfcl` language subset and
+locally converts its JSON-encoded conversation, functions, and possible answers
+to EuroEval's tool-calling input. It does not rely on private derived mini
+repositories or change EuroEval. A fresh one-example Danish dummy-model run
+passed on 9 October 2026 (0% tool-calling accuracy, not a model result):
+
+```bash
+uv run --no-project --python 3.12 --with euroeval \
+  paper/run_multibfcl.py --model dummy --language da --max-examples 1
+```
+
+For a real small non-reasoning model on this M5, use a synced EuroEval source
+checkout with Metal support as in the MultiIFEval example, replacing the script
+path and omitting `--max-examples` to score a full language subset. The two
+tasks use different metrics; report them separately. EuroEval's current
+text-to-text implementation requires the bootstrap path when there are no
+cached outputs; consequently a full MultiBFCL run samples with replacement
+and may not evaluate every distinct public row. Record the dataset revision,
+bootstrap seed, number of draws, unique IDs covered, and any scorer errors.
+A one-example smoke run does not establish the model's BFCL accuracy.
+
 ## Before submission
 
 - Run the small MultiIFEval evaluation and add **actual** scores, sample counts,
@@ -102,7 +125,7 @@ reliably before reporting aggregate scores.
   translation quality and data rights, and run a separate limited evaluation
   with EuroEval's tool-calling task. Its 31 translated registrations plus
   English BFCL-v2 cover 32 EuroEval languages; derived mini datasets may be
-  private, so verify access or prepare them locally from the public Hub source.
+  private, so use the local public-Hub config or document access.
   Do not claim model scores before they exist.
 - Verify the released config inventory and per-language missing examples against a
   pinned Hub revision. State that 305 configs do not imply 305 validated translations.

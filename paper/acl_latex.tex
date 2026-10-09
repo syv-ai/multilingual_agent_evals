@@ -270,8 +270,10 @@ manual-versus-machine parallel evaluations.
 
 EuroEval already registers tool calling for 31 translated MultiBFCL languages
 plus English BFCL-v2, using a separate tool-calling accuracy metric. Its
-converted mini datasets may require access, so a reproducible experiment should
-start from the public MultiBFCL release or document the derived dataset revision.
+converted mini datasets may require access; our companion local configuration
+converts the public MultiBFCL fields instead, without modifying EuroEval.
+The current EuroEval scorer's bootstrap path samples with replacement, so
+report the unique examples covered rather than equating draws with full coverage.
 Select a frozen translated subset, run a small non-reasoning model with the
 relevant tool definitions, and score calls against the corresponding possible
 answers using an upstream-compatible checker. Prompt translation alone does not make the
