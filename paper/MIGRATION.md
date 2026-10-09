@@ -1,73 +1,63 @@
-# Proposed `multilingual_agent_evals` consolidation
+# Combined repository cutover
 
-**Decision:** One NoDaLiDa 2027 paper about **MultiIFEval and MultiBFCL as two
-separate datasets**; one code repository with `src/multi_ifeval/` and
-`src/multi_bfcl/`. Draft the paper now. Do **not** move or rename repositories,
-interrupt translations, change publishing destinations, or publish BFCL outputs
-until the current MultiBFCL translation jobs have finished and the cutover has
-been approved.
+**Decision:** One NoDaLiDa 2027 paper on **MultiIFEval and MultiBFCL as two
+separate datasets**; one code repository, `syv-ai/multilingual_agent_evals`,
+with `src/multi_ifeval/` and `src/multi_bfcl/`. Keep their Hugging Face dataset
+IDs unchanged. The owner approved merging the paper branch into `main`,
+renaming the IFEval code repository, and deleting the old BFCL code repository
+only after the combined repository is verified.
 
-## Current boundaries
+## Completed locally (9 October 2026)
 
-- The current code repositories are `syv-ai/multi_ifeval` and
-  `syv-ai/multi_bfcl`, each with its own upstream Alexandra Institute remote.
-  Both software repositories have MIT notices naming syv.ai and the Alexandra
-  Institute; preserve those notices. The public MultiIFEval dataset remains at
-  `danish-foundation-models/multi-ifeval` with its own CC BY-NC-SA 4.0 licence.
-- MultiBFCL is still generating per-language `data/bfcl-*.jsonl` checkpoints
-  outside Git. On 3 October 2026, generation-related Python processes were
-  active and the ignored `data/` directory occupied approximately 578 MB.
-  No migration should touch those files or their writers while active.
-- MultiBFCL selects ten BFCL-v2 categories from files currently named
-  `BFCL_v4_*` upstream: BFCL-v2 is a subset of the v4 distribution, not a
-  different intended task. The upstream URL follows a moving `main` branch;
-  pin its commit and subset inventory before any resumed translation,
-  publication, or paper counts.
-- MultiBFCL derives candidate languages from `alexandrainst/multi-wiki-qa`
-  and intersects them with its own language definitions. Do not assume its
-  complete translated language inventory equals MultiIFEval's 305 configs.
-  Its current code translates selected messages, not tool descriptions; it
-  does not include a model evaluation pipeline or published dataset card.
+- Confirmed both source Git checkouts clean and their `main` branches at their
+  respective origin tips. The earlier BFCL translation processes had stopped.
+- Saved verified Git bundles of both repositories and a separate copy of 305
+  ignored BFCL JSONL checkpoints, with a SHA-256 manifest, at
+  `~/gitsky/_migration_backups/multilingual_agent_evals_2026-10-09/`.
+  No `.env`, API credentials or model caches were copied into Git.
+- Fast-forwarded the paper branch onto the IFEval checkout's `main`; imported
+  MultiBFCL's Git history as a second parent and moved its package, CLI and
+  tests into separate root paths. Kept the two original package import names.
+- Reconciled a single Python 3.12 project and lockfile. The offline combined
+  pytest suite passed (21 tests), as did pre-commit after the integration fixes.
+  Copied the 305 ignored BFCL checkpoints from the backup into the combined
+  checkout and verified the copy byte-for-byte with `rsync --checksum`.
+- Verified the published datasets: `danish-foundation-models/multi-ifeval`
+  (CC BY-NC-SA 4.0) and `syvai/multi-bfcl` (CC BY-NC 4.0), each advertising
+  305 language configurations. EuroEval registers tool calling for 31
+  translated BFCL languages plus English, but its derived mini repositories
+  may be private. No model scores were created as part of this migration.
 
-## Cutover gates
+## Public cutover checklist
 
-1. **Before touching either repository:** confirm writers have finished; record
-   process state, the two clean and up-to-date `main` commit IDs, ignored file
-   counts and checksums, and an independently stored, immutable backup of BFCL
-   JSONL checkpoints. Freeze the BFCL source revision and compare each resumed
-   checkpoint's example IDs and source-aligned fields against that revision;
-   stop on mismatch instead of mixing source versions. Review upstream BFCL
-   and MultiWikiQA terms for redistribution.
-   Do not copy `.env`, API tokens, model caches, or generated data into Git.
-2. **Choose a canonical public repository:** propose preserving the
-   `multi_ifeval` history as the base and renaming it to
-   `syv-ai/multilingual_agent_evals`, then importing MultiBFCL's Git history
-   without rewriting either old history. This rename and the treatment of the
-   old BFCL repository require an explicit cutover decision: retain it as a
-   read-only pointer/archive if appropriate. Keep both old URLs usable via
-   redirects or documentation; do not repoint Hugging Face IDs by default.
-3. **Integrate code after the writer stops:** import BFCL under a temporary
-   prefix with history preserved, then move its Python package to
-   `src/multi_bfcl/`, rename colliding scripts/tests, and retain
-   `src/multi_ifeval/` separately. Reconcile `pyproject.toml`, `uv.lock`,
-   packaging, Python 3.12 tools, CI, docs, `AGENTS.md`, and ignored output
-   paths. Preserve both translation commands and BFCL resume-by-ID semantics;
-   make the source loader read the frozen BFCL revision before any resumption.
-4. **Verify before switching production:** install from the locked environment;
-   import and test both packages; run all offline tests, pre-commit, and CLI
-   help checks without generation or network writes. Compare checkpoint hashes
-   and perform one controlled BFCL resume from a disposable copy of the
-   checkpoints against the frozen BFCL revision before retiring the original
-   writer. Never append to the rollback backup. CI should check the direct-main workflow.
-5. **Paper and release:** the draft can be written in parallel. Keep the two
-   methods, dataset versions, quality limitations and metrics distinct. Add
-   actual small-model results for each only after a working evaluator and
-   checked translated samples exist. Document BFCL rights and publication
-   status; arrange anonymous review access and check NoDaLiDa page limits.
-   MultiIFEval's existing public Hub URL stays stable.
+1. Re-run locked tests, pre-commit, both CLI help commands and `git diff --check`.
+   Ensure neither secrets nor checkpoint JSONL files are staged. Verify both
+   source Git SHAs are ancestors of the integration commit.
+2. Push the tested combined `main` without force to the existing
+   `syv-ai/multi_ifeval` remote. Confirm the remote commit and CI. Rename that
+   repository to `syv-ai/multilingual_agent_evals`, update the local `origin`,
+   and verify a fresh fetch and links at the new URL.
+3. Verify the old BFCL history is reachable in the new repo and retain its
+   local checkout and backup. Only then retire `syv-ai/multi_bfcl`. Git history
+   can be recreated from the bundle, but deletion loses issues, stars, settings,
+   and the old URL. Do not delete on a failed check.
 
-**Rollback:** do not delete or force-push either original repository. Keep the
-original BFCL checkout and immutable checkpoint backup until the merged code
-has passed CI and resumed a translation safely. On any mismatch, stop the new
-writer and restore to a new working directory from the verified backup; keep
-the backup unchanged.
+## Independent data and paper work still required
+
+- BFCL-v2 is intentionally the subset of files named `BFCL_v4_*` upstream.
+  The loader follows a mutable `main` URL. Before resuming translation, pin
+  the BFCL source commit and compare checkpointed IDs and source-aligned
+  fields with it. On mismatch, stop rather than mixing revisions; test resume
+  from a disposable checkpoint copy, never from the immutable backup.
+- The public BFCL release has its own licence. Review the upstream BFCL and
+  MultiWikiQA source terms, translation quality, per-language sample counts,
+  and tool metadata left in English. Do not treat 305 configs as human
+  validation or EuroEval registration as a model evaluation result.
+- The paper needs separate real model results, an anonymous reviewer access
+  route, a verified PDF/page count, and pinned dataset revisions. Neither
+  dataset ID or publication destination should be silently redirected.
+
+**Rollback:** retain the old BFCL checkout, both Git bundles and the immutable
+checkpoint backup. If the new writer ever fails, restore to a *new* working
+copy from the backup and check source alignment before resuming. Do not
+force-push published `main`; use a revert if the integrated code must be undone.

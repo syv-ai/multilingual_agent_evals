@@ -7,7 +7,7 @@ this script modifies EuroEval or starts an evaluation until invoked explicitly.
 import argparse
 from functools import partial
 
-from datasets import DatasetDict
+from datasets import Dataset, DatasetDict
 from euroeval import Benchmarker, DatasetConfig
 from euroeval.languages import DANISH, ENGLISH, FRENCH, GERMAN
 from euroeval.tasks import INSTRUCTION_FOLLOWING
@@ -33,9 +33,11 @@ def _preprocess(dataset: DatasetDict, max_examples: int | None = None) -> Datase
         Dataset with a text input column and sparse constraint arguments.
     """
     if max_examples is not None:
-        dataset["test"] = dataset["test"].select(
-            range(min(max_examples, len(dataset["test"])))
-        )
+        test_split = dataset["test"]
+        assert isinstance(test_split, Dataset)
+        selected = test_split.select(range(min(max_examples, len(test_split))))
+        assert isinstance(selected, Dataset)
+        dataset["test"] = selected
     dataset = dataset.map(
         lambda row: {"text": row["prompt"]}, remove_columns=["prompt"]
     )

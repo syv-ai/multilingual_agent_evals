@@ -9,3 +9,4 @@ nav:
   - .
   - API Reference:
     - $api:src/multi_ifeval.***
+    - $api:src/multi_bfcl.***

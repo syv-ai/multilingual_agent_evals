@@ -113,6 +113,7 @@ site/
 
 # Generated files
 data/ifeval-*.jsonl
+data/bfcl-*.jsonl
 
 # LaTeX
 **/*.aux

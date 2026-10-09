@@ -2,10 +2,10 @@
 
 The draft now treats **MultiIFEval and MultiBFCL as separate multilingual agentic
 evaluation datasets** in one paper, not as a single newly named dataset. MultiIFEval
-is released; MultiBFCL's BFCL-v2 subset translations and evaluation protocol are
-still in progress. The codebase merger into a proposed `multilingual_agent_evals`
-repository is deferred until active translation jobs finish; see [the migration
-plan](MIGRATION.md). No repository has been renamed or merged yet.
+and MultiBFCL are both released, each with 305 language configurations and
+separate licences. The shared code repository keeps the two Python packages
+distinct; see the [migration record](MIGRATION.md). Neither dataset yet has
+reportable model evaluations in this draft.
 
 The [official call](https://eventsignup.ku.dk/nodalida-27/call-for-papers)
 requires ACL style files; `acl_latex.tex` uses `acl.sty` in `review` mode.
@@ -24,11 +24,13 @@ Keep the review PDF anonymous: do not restore the author block, identify the tea
 acknowledgements, or link directly to the released Hub repository, whose commit
 history identifies the uploader. Arrange a reviewer-accessible anonymous copy or
 other CFP-compliant access method before submission. For camera-ready, restore the
-original public URL, accurate author affiliations and acknowledgements. The dataset
-has already been released at
-<https://huggingface.co/datasets/danish-foundation-models/multi-ifeval> under
-CC BY-NC-SA 4.0. The live Hub split listing currently exposes 305 language
-configurations; pin a Hub commit and check counts before making precise claims.
+original public URLs, accurate author affiliations and acknowledgements.
+MultiIFEval is at
+<https://huggingface.co/datasets/danish-foundation-models/multi-ifeval>
+(CC BY-NC-SA 4.0), and MultiBFCL is at
+<https://huggingface.co/datasets/syvai/multi-bfcl> (CC BY-NC 4.0).
+Each card lists 305 language configurations. Pin both Hub revisions and check
+per-language counts before making more precise claims.
 
 ## Small evaluation (not yet run)
 
@@ -96,10 +98,12 @@ reliably before reporting aggregate scores.
 
 - Run the small MultiIFEval evaluation and add **actual** scores, sample counts,
   scorer errors, and inspected failures. A one-example M5 smoke test is not a result.
-- For MultiBFCL, pin the upstream BFCL commit and completed subset inventory,
-  check translation quality and data rights, establish a tool-call scoring protocol,
-  and run a separate limited model evaluation. Do not claim a release or scores
-  before they exist.
+- For MultiBFCL, pin the upstream BFCL commit and subset inventory, check
+  translation quality and data rights, and run a separate limited evaluation
+  with EuroEval's tool-calling task. Its 31 translated registrations plus
+  English BFCL-v2 cover 32 EuroEval languages; derived mini datasets may be
+  private, so verify access or prepare them locally from the public Hub source.
+  Do not claim model scores before they exist.
 - Verify the released config inventory and per-language missing examples against a
   pinned Hub revision. State that 305 configs do not imply 305 validated translations.
 - If using the manual Danish translation, document availability, alignment and

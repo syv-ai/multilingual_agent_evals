@@ -1,6 +1,5 @@
-<!-- This disables the "First line in file should be a top level heading" rule -->
 <!-- markdownlint-disable MD041 -->
-<a href="https://github.com/syv-ai/multi_ifeval">
+<a href="https://github.com/syv-ai/multilingual_agent_evals">
 <img
  src="assets/syv-ai-logo.svg"
  width="120"
@@ -10,31 +9,54 @@
 />
 </a>
 
-# Multi Ifeval
+# Multilingual Agent Evaluations
 
-An automatically generated multilingual version of IFEval, for 300+ languages.
+Two separate multilingual datasets for agent-relevant capabilities:
 
-______________________________________________________________________
-[![Code Coverage](https://img.shields.io/badge/Coverage-0%25-red.svg)](https://github.com/syv-ai/multi_ifeval/tree/main/tests)
-[![License](https://img.shields.io/github/license/syv-ai/multi_ifeval)](https://github.com/syv-ai/multi_ifeval/blob/main/LICENSE)
-[![LastCommit](https://img.shields.io/github/last-commit/syv-ai/multi_ifeval)](https://github.com/syv-ai/multi_ifeval/commits/main)
-[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.0-4baaaa.svg)](https://github.com/syv-ai/multi_ifeval/blob/main/CODE_OF_CONDUCT.md)
+| Dataset | Capability | Public release |
+| --- | --- | --- |
+| **MultiIFEval** | Verifiable instruction following, 305 language configurations | [Hugging Face](https://huggingface.co/datasets/danish-foundation-models/multi-ifeval) (CC BY-NC-SA 4.0) |
+| **MultiBFCL** | Tool calling on BFCL-v2 subsets, 305 language configurations | [Hugging Face](https://huggingface.co/datasets/syvai/multi-bfcl) (CC BY-NC 4.0) |
 
-Developer:
+The source packages remain independent under `src/multi_ifeval/` and
+`src/multi_bfcl/`. This repository is not a third dataset, and neither dataset's
+Hugging Face identifier has changed. MultiBFCL uses BFCL-v2 categories from the
+upstream `BFCL_v4_*` file layout. For more details on the paper and its remaining
+work, see [`paper/README.md`](paper/README.md).
 
-- Dan Saattrup Smart
+## Install and check
 
-## Setup
+Python 3.12 and [uv](https://docs.astral.sh/uv/) are required.
 
-### Installation
+```bash
+uv sync --python 3.12 --locked --all-extras --dev
+uv run --python 3.12 --locked pytest
+uv run --python 3.12 --locked pre-commit run --all-files
+```
 
-1. Run `make install`, which sets up a virtual environment and all Python dependencies
-   therein.
-2. Run `source .venv/bin/activate` to activate the virtual environment.
+## Translate
 
-### Quickstart
+Translation requires model API credentials and may incur API costs. The two CLIs
+are separate and save per-language, resumable JSONL checkpoints in `data/`:
 
-Run `uv run src/scripts/translate_ifeval.py` to translate the IFEval dataset to
-different languages. By default this uses the Gemini-3-flash model, which requires
-you to have set the `GEMINI_API_KEY` environment variable. You can also specify a
-different model with the `--model` flag.
+```bash
+uv run --python 3.12 --locked src/scripts/translate_ifeval.py --help
+uv run --python 3.12 --locked src/scripts/translate_bfcl.py --help
+```
+
+Keep `.env`, generated datasets, and translation checkpoints out of Git. The
+MultiBFCL loader currently fetches its upstream source from a moving branch;
+pin that source revision for reproducible runs. The code is MIT-licensed with
+historical Alexandra Institute attribution in `LICENSE`; dataset licences are
+listed separately above.
+
+## Evaluation and paper
+
+MultiIFEval can be used through a local EuroEval configuration; see
+[`paper/run_euroeval.py`](paper/run_euroeval.py). EuroEval has BFCL-v2 English and
+31 translated MultiBFCL language registrations for its separate `tool-calling`
+metric. Its derived mini datasets may require access, so the public MultiBFCL
+Hub release is the authoritative data source. Neither task's registration is a
+model score. The [combined NoDaLiDa draft](paper/acl_latex.tex) keeps both tasks,
+methods, metrics, and limitations distinct; reported model results still need to
+be collected and checked.

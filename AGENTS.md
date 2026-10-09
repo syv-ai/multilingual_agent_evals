@@ -1,14 +1,16 @@
-# Multi Ifeval
+# Multilingual Agent Evaluations
 
-This repository generates a multilingual IFEval dataset for 300+ languages. It belongs
-to syv.ai; preserve the historical Alexandra Institute attribution in `LICENSE`.
+This syv.ai repository contains two separate multilingual evaluation resources:
+MultiIFEval (verifiable instruction following) and MultiBFCL (BFCL-v2 tool calling).
+Preserve the Alexandra Institute attribution in `LICENSE`.
 
 ## Stack and layout
 
-- Python 3.12 with `uv` and `uv.lock`; use `uv run` for Python commands.
-- `src/multi_ifeval/` contains dataset loading, translation, models and languages.
-- `src/scripts/` contains the translation and Hugging Face upload scripts.
-- `tests/` contains the pytest suite; `assets/` holds the README logo.
+- Python 3.12, `uv`, one `uv.lock`, and two installable packages under `src/`:
+  `multi_ifeval/` and `multi_bfcl/`.
+- `src/scripts/` contains separate translation CLIs and dataset utilities.
+- `tests/` covers both packages. `paper/` contains the combined NoDaLiDa draft.
+- `data/` holds ignored JSONL translation checkpoints. Never commit them or `.env`.
 
 ## Running and checking
 
@@ -18,23 +20,39 @@ uv run --python 3.12 --locked pytest
 uv run --python 3.12 --locked pre-commit run --all-files
 ```
 
-See `README.md` for translation usage. Translation requires a model API key; do not
-commit keys, `.env` files or generated datasets. Run checks before pushing.
+Translation requires a model API key and may spend money. Do not run translation
+as a test. Both scripts resume from `data/<benchmark>-<language>.jsonl`:
+
+```bash
+uv run --python 3.12 --locked src/scripts/translate_ifeval.py --help
+uv run --python 3.12 --locked src/scripts/translate_bfcl.py --help
+```
 
 ## Git workflow
 
-**Always work directly on `main` in this repository and push commits to `origin/main`.**
-Do not create feature branches or PRs for routine agent changes. Check that the main
-checkout is clean and up to date with `origin/main` before editing; do not overwrite
-uncommitted work or force-push. Use Conventional Commit messages. If direct pushes are
-blocked, stop and report the blocker rather than bypassing branch protection.
+Work directly on `main` and push commits to `origin/main`. Check for a clean,
+up-to-date main checkout before editing. Do not overwrite other work, force-push,
+or use worktrees for routine changes. Use Conventional Commit messages. If direct
+pushes are blocked, report the blocker instead of bypassing branch protection.
 
 ## Gotchas
 
-- Use Python 3.12 explicitly: newer default interpreters may fail when importing the
-  locked dataset dependencies during test collection.
-- The `alexandrainst/multi-wiki-qa` IDs are intentional Hugging Face dataset sources.
-  The upload script also points at an existing `alexandrainst/multi-ifeval` ID; do not
-  redirect dataset publishing as part of a branding change.
-- The README logo is tracked at `assets/syv-ai-logo.svg`; do not reference a private
-  filesystem path or an externally hosted Alexandra logo.
+- Use Python 3.12 explicitly: newer defaults can fail on locked dependencies.
+- MultiBFCL's BFCL-v2 category files are named `BFCL_v4_*` upstream. The loader
+  currently follows upstream `main`; pin the source before claiming a reproducible
+  release. Its translation does not translate tool metadata.
+- The public datasets are separate: `danish-foundation-models/multi-ifeval`
+  (CC BY-NC-SA 4.0) and `syvai/multi-bfcl` (CC BY-NC 4.0). Do not rename or
+  republish either dataset as part of a code-repository change. Existing
+  `alexandrainst/multi-wiki-qa` sources and the IFEval upload target
+  `alexandrainst/multi-ifeval` are intentional legacy identifiers.
+- MultiBFCL's ignored `data/bfcl-*.jsonl` files are resumable checkpoints;
+  deleting one restarts that language. `load_bfcl()` downloads upstream on each
+  call and may wait 60 seconds on a rate limit. Keep API keys and local caches
+  out of Git.
+- EuroEval's 31 translated BFCL registrations plus English constitute its
+  32-language tool-calling support. Its derived `EuroEval/multi-bfcl-*-mini`
+  repositories may be private; registration is not a published model result.
+- In `paper/`, `run_euroeval.py` is named deliberately: a file named
+  `evaluate.py` shadows EuroEval's `evaluate` dependency. The paper is still a
+  draft without full model results or an anonymous reviewer-accessible release.

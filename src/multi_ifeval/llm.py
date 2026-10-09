@@ -45,13 +45,14 @@ def generate(
             happening in the response format.
     """
     conversation = [dict(role="user", content=prompt)]
-    response: ModelResponse = litellm.completion(  # pyrefly: ignore[not-callable]
+    response = litellm.completion(  # pyrefly: ignore[not-callable]
         model=model,
         messages=conversation,
         temperature=temperature,
         max_tokens=max_tokens,
         response_format=response_format,
     )
+    assert isinstance(response, ModelResponse)
     choice = response.choices[0]
     assert isinstance(choice, Choices), (
         f"Expected a Choices object, but got {type(choice)}"
@@ -83,6 +84,7 @@ def generate(
                     max_tokens=max_tokens,
                     response_format=response_format,
                 )
+                assert isinstance(response, ModelResponse)
                 choice = response.choices[0]
                 assert isinstance(choice, Choices), (
                     f"Expected a Choices object, but got {type(choice)}"

@@ -1158,12 +1158,14 @@ def create_box_plot(
     # Prepare data for box plot
     groups = df.groupby("group")["accuracy"]
     group_names = sorted(groups.groups.keys())
-    group_data = [groups.get_group(name).values for name in group_names]
+    group_data = [
+        [float(value) for value in groups.get_group(name)] for name in group_names
+    ]
 
     # Create box plot
     bp = ax.boxplot(
         group_data,
-        labels=group_names,
+        tick_labels=group_names,
         patch_artist=True,
         notch=True,
         showmeans=True,
@@ -1238,13 +1240,16 @@ def create_comparison_plot(
     fig, ax = plt.subplots(figsize=(10, 6))
 
     data_to_plot = [
-        lang_df[lang_df["translation_type"] == tt]["accuracy"].values
+        [
+            float(value)
+            for value in lang_df[lang_df["translation_type"] == tt]["accuracy"]
+        ]
         for tt in translation_types
     ]
 
     bp = ax.boxplot(
         data_to_plot,
-        labels=[tt.replace("_", " ").title() for tt in translation_types],
+        tick_labels=[tt.replace("_", " ").title() for tt in translation_types],
         patch_artist=True,
         notch=True,
         showmeans=True,
